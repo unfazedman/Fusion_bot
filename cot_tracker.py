@@ -41,7 +41,7 @@ CFTC_API_URL = "https://publicreporting.cftc.gov/resource/jun7-fc8e.json"
 # CFTC market names for our pairs
 CFTC_MARKETS = {
     'EUR/USD': 'EURO FX - CHICAGO MERCANTILE EXCHANGE',
-    'GBP/USD': 'BP - BRITISH POUND STERLING - CHICAGO MERCANTILE EXCHANGE',
+    'GBP/USD': 'BRITISH POUND - CHICAGO MERCANTILE EXCHANGE',
 }
 
 
