@@ -6,7 +6,7 @@ pyTelegramBotAPI==4.18.0
 
 # --- Supabase ---
 supabase==2.4.0
-gotrue==2.4.0
+# gotrue is installed automatically as a supabase dependency — do not pin separately
 
 # --- HTTP ---
 requests==2.31.0
