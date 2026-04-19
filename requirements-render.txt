@@ -1,0 +1,26 @@
+# Fusion Score Bot V7.0 — Render Requirements
+# Minimal subset for the Render free tier (512MB RAM).
+# pandas and numpy intentionally EXCLUDED — they cause OOM crashes on 512MB.
+# volatility_atr.py does all calculations with pure Python math.
+
+# --- Telegram ---
+pyTelegramBotAPI==4.18.0
+
+# --- Supabase ---
+supabase==2.4.0
+gotrue==2.4.0
+
+# --- HTTP ---
+requests==2.31.0
+
+# --- Flask (keepalive web server) ---
+flask==3.0.3
+
+# --- RSS Feed Parsing (Geopolitical Dragnet) ---
+feedparser==6.0.11
+
+# --- Timezone ---
+pytz==2024.1
+
+# --- Date utilities ---
+python-dateutil==2.9.0

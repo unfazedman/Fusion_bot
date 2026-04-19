@@ -1,0 +1,25 @@
+# Fusion Score Bot V7.0 — GitHub Actions Requirements
+# Used by all workflow jobs (bot.yml, sentiment.yml, cot.yml, grader.yml, health.yml)
+
+# --- Telegram ---
+pyTelegramBotAPI==4.18.0
+
+# --- Supabase ---
+supabase==2.4.0
+gotrue==2.4.0
+
+# --- HTTP ---
+requests==2.31.0
+
+# --- RSS Feed Parsing (Geopolitical Dragnet + sentiment collection) ---
+feedparser==6.0.11
+
+# --- Python version pinning ---
+# Matches .python-version (3.11.9)
+# All workflows use python-version: '3.11'
+
+# --- Data ---
+python-dateutil==2.9.0
+
+# --- Standard library (no install needed, listed for documentation) ---
+# re, threading, hashlib, time, logging, os, datetime, difflib, json
