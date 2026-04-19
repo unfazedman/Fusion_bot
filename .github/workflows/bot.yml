@@ -1,0 +1,56 @@
+name: Bot Scheduler
+
+on:
+  schedule:
+    # Runs at 07:00 UTC daily (12:30 PM IST) — catches morning market session
+    # Run again at 12:00 UTC (5:30 PM IST) — catches US afternoon session
+    - cron: '0 7 * * 1-5'
+    - cron: '0 12 * * 1-5'
+  workflow_dispatch:
+    # Manual trigger restricted to repo owner only (see security check below)
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6-hour max
+
+    steps:
+      - name: Verify dispatch authorization
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [ "${{ github.actor }}" != "${{ secrets.REPO_OWNER_USERNAME }}" ]; then
+            echo "Unauthorized dispatch by ${{ github.actor }}. Only repo owner may trigger manually."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Upgrade pip
+        run: pip install --upgrade pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Bot Scheduler
+        env:
+          TELEGRAM_TOKEN:      ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
+          ERROR_BOT_TOKEN:     ${{ secrets.ERROR_BOT_TOKEN }}
+          ERROR_CHAT_ID:       ${{ secrets.ERROR_CHAT_ID }}
+          FREE_CHANNEL_ID:     ${{ secrets.FREE_CHANNEL_ID }}
+          PREMIUM_CHANNEL_ID:  ${{ secrets.PREMIUM_CHANNEL_ID }}
+          SUPABASE_URL:        ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY:        ${{ secrets.SUPABASE_KEY }}
+          GEMINI_API_KEY:      ${{ secrets.GEMINI_API_KEY }}
+          HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+          GNEWS_API_KEY:       ${{ secrets.GNEWS_API_KEY }}
+          NEWS_API_KEY:        ${{ secrets.NEWS_API_KEY }}
+          ACTIVE_STRATEGY:     ${{ secrets.ACTIVE_STRATEGY }}
+        run: python bot.py
+        
