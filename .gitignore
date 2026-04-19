@@ -1,0 +1,106 @@
+# =============================================================================
+# Fusion Score Bot V7 — .gitignore
+# PUBLIC REPO — This file is critical. Never commit secrets or state files.
+# =============================================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# --- Virtual Environments ---
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# --- State Files (NEVER commit — contain intelligence data) ---
+state.json
+scanner_state.json
+*.state.json
+
+# --- Local Config & Secrets ---
+.env.local
+.env.*.local
+secrets.json
+credentials.json
+*.key
+*.pem
+*.p12
+
+# --- Logs ---
+*.log
+logs/
+*.log.*
+
+# --- OS ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# --- IDEs ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# --- Testing & Coverage ---
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+nosetests.xml
+test-output/
+
+# --- Jupyter ---
+.ipynb_checkpoints
+*.ipynb
+
+# --- Local dev overrides ---
+local_settings.py
+instance/
+.webassets-cache
+
+# --- Documentation build ---
+docs/_build/
+site/
