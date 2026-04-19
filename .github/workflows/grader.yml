@@ -1,0 +1,41 @@
+name: Performance Grader
+
+on:
+  schedule:
+    # Every 2 hours on weekdays during market hours
+    - cron: '0 4,6,8,10,12,14,16,18 * * 1-5'
+  workflow_dispatch:
+    # Manual trigger restricted to repo owner
+
+jobs:
+  run-grader:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Verify dispatch authorization
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [ "${{ github.actor }}" != "${{ secrets.REPO_OWNER_USERNAME }}" ]; then
+            echo "Unauthorized dispatch by ${{ github.actor }}."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install --upgrade pip && pip install -r requirements.txt
+
+      - name: Run Performance Grader
+        env:
+          TELEGRAM_TOKEN:   ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ERROR_BOT_TOKEN:  ${{ secrets.ERROR_BOT_TOKEN }}
+          ERROR_CHAT_ID:    ${{ secrets.ERROR_CHAT_ID }}
+          SUPABASE_URL:     ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY:     ${{ secrets.SUPABASE_KEY }}
+          TWELVE_DATA_KEY:  ${{ secrets.TWELVE_DATA_KEY }}
+        run: python performance_grader.py
