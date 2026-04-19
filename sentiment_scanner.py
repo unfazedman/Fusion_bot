@@ -461,14 +461,14 @@ class SentimentScannerPipeline:
         V7 FIX: V6 had no sanitization — full prompt injection vulnerability.
 
         Removes:
-            - JSON structural characters ({, }, ", ', \)
+            - JSON structural characters ({, }, ", ', \\)
             - Common injection trigger phrases
             - Excessive length
         """
         if not text:
             return ""
         # Remove JSON structural chars
-        text = re.sub(r'[{}\"\\'\\\\]', ' ', text)
+        text = re.sub('[{}"\\\\]', ' ', text)
         # Remove injection trigger patterns
         injection_patterns = [
             r'ignore\s+(previous|all|above|instructions?)',
