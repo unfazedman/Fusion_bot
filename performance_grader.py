@@ -78,9 +78,9 @@ class PerformanceGrader:
         Returns:
             List of candle dicts or empty list on error.
         """
-        symbol = pair.replace('/', '')
+        
         params = {
-            'symbol':     symbol,
+            'symbol':     pair,
             'interval':   '5min',
             'outputsize': count,
             'start_date': start_time,
