@@ -122,6 +122,9 @@ class VolatilityEngine:
         self.last_alerted_candles = {pair: None for pair in PAIRS}
         self._seed_alerted_candles()
 
+        # Saturation cache: only fetch once per hour to save TwelveData credits
+        self._saturation_cache = {pair: (0.0, None) for pair in PAIRS}
+
         _update_status("strategy", self.strategy.name)
         logger.info(f"[Engine] Strategy: {self.strategy.name} v{self.strategy.version}")
 
@@ -328,14 +331,16 @@ class VolatilityEngine:
 
     def _get_daily_range_saturation(self, pair: str) -> float:
         """
-        Returns daily range saturation: 0.0 (fresh day) to 1.0 (full range consumed).
-        Compares today's forming range to last 4 days' average range.
-        Returns 0.0 on error (safe — won't suppress signal on API failure).
-
-        Cost: 1 extra TwelveData API credit per pair per 5-min cycle.
+        Cached per hour — only calls TwelveData once per hour per pair.
+        Saves ~480 credits/day on the 800/day free tier.
         """
         try:
-            
+            current_hour = datetime.now(timezone.utc).hour
+            cached_value, cached_hour = self._saturation_cache.get(pair, (0.0, None))
+
+            if cached_hour == current_hour:
+                return cached_value
+
             params = {
                 'symbol':     pair,
                 'interval':   '1day',
@@ -347,6 +352,7 @@ class VolatilityEngine:
             candles = data.get('values', [])
 
             if len(candles) < 3:
+                self._saturation_cache[pair] = (0.0, current_hour)
                 return 0.0
 
             today_range = float(candles[0]['high']) - float(candles[0]['low'])
@@ -354,13 +360,12 @@ class VolatilityEngine:
                 float(c['high']) - float(c['low']) for c in candles[1:5]
             ) / min(4, len(candles) - 1)
 
-            if avg_range <= 0:
-                return 0.0
-
-            return min(1.0, today_range / avg_range)
+            result = min(1.0, today_range / avg_range) if avg_range > 0 else 0.0
+            self._saturation_cache[pair] = (result, current_hour)
+            return result
 
         except Exception:
-            return 0.0  # Never suppress signal on saturation fetch failure
+            return 0.0 # Never suppress signal on saturation fetch failure
 
     # -------------------------------------------------------------------------
     # MARKET HOURS
