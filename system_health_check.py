@@ -81,9 +81,9 @@ class HealthChecker:
 
     def check_supabase(self):
         try:
-            resp = self.supabase.table("system_state").select("pair").limit(1).execute()
+            resp = self.supabase.table("system_state").select("pair").execute()
             if resp.data is not None:
-                self._add('OK', 'Supabase', f"{len(resp.data)} system_state rows accessible")
+                self._add('OK', 'Supabase', f"{len(resp.data)}/2 system_state rows accessible")
             else:
                 self._add('FAIL', 'Supabase', "Query returned None")
         except Exception as e:
@@ -219,18 +219,14 @@ class HealthChecker:
     # =========================================================================
 
     def check_twelvedata(self):
+        # Uses /api_usage endpoint — zero credits consumed
         if not TWELVE_DATA_KEY:
             self._add('WARN', 'TwelveData', "TWELVE_DATA_KEY not configured")
             return
         try:
-            params = {
-                'symbol':     'EURUSD',
-                'interval':   '1min',
-                'outputsize': 1,
-                'apikey':     TWELVE_DATA_KEY,
-            }
+            params = {'apikey': TWELVE_DATA_KEY}
             resp = requests.get(
-                "https://api.twelvedata.com/time_series",
+                "https://api.twelvedata.com/api_usage",
                 params=params,
                 timeout=10
             )
@@ -239,14 +235,12 @@ class HealthChecker:
 
             if data.get('status') == 'error':
                 msg = data.get('message', 'Unknown error')
-                if 'apikey' in msg.lower() or 'limit' in msg.lower():
-                    self._add('FAIL', 'TwelveData', f"API error: {msg[:100]}")
-                else:
-                    self._add('WARN', 'TwelveData', f"API error: {msg[:100]}")
+                self._add('FAIL', 'TwelveData', f"API error: {msg[:100]}")
             else:
-                values = data.get('values', [])
-                latest = values[0].get('datetime', 'N/A') if values else 'No data'
-                self._add('OK', 'TwelveData', f"Reachable. Latest candle: {latest}")
+                used  = data.get('current_usage', '?')
+                limit = data.get('plan_limit', '?')
+                plan  = data.get('plan_name', 'Unknown')
+                self._add('OK', 'TwelveData', f"Reachable. Credits: {used}/{limit} ({plan})")
 
         except Exception as e:
             self._add('FAIL', 'TwelveData', f"Request failed: {str(e)[:100]}")
