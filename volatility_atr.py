@@ -173,10 +173,10 @@ class VolatilityEngine:
         Returns:
             List of candle dicts (newest first) or empty list on error.
         """
-        symbol = pair.replace('/', '')
+        
         url    = "https://api.twelvedata.com/time_series"
         params = {
-            'symbol':     symbol,
+            'symbol':     pair,
             'interval':   '5min',
             'outputsize': 32,
             'apikey':     TWELVE_DATA_KEY,
@@ -335,9 +335,9 @@ class VolatilityEngine:
         Cost: 1 extra TwelveData API credit per pair per 5-min cycle.
         """
         try:
-            symbol = pair.replace('/', '')
+            
             params = {
-                'symbol':     symbol,
+                'symbol':     pair,
                 'interval':   '1day',
                 'outputsize': 5,
                 'apikey':     TWELVE_DATA_KEY,
